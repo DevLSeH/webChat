@@ -48,7 +48,8 @@
           const msg = {
               'time': `${time()}`,
               'userId': `${document.getElementById("userId").value}`,
-              'msg': `${document.getElementById("msg").value}`
+              'msg': `${document.getElementById("msg").value}`,
+              'room': `${window.location.href.replace("http://localhost:3000/","")}`
           };
           document.getElementById("msg").value = "";
           if(msg.userId == "") {alert("userId는 필수입니다"); return;}

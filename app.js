@@ -2,6 +2,16 @@ const app = require("express")();
 const server = app.listen(3000, () => {});
 const SocketIO = require("socket.io");
 const io = SocketIO(server, {path:"/socket.io"});
+const mysql = require("mysql2");
+const connection = mysql.createConnection({
+  host:'localhost',
+  user:'root',
+  port:'3306',
+  password:'shaan1028!',
+  database:'socketio',
+})
+
+connection.connect();
 
 function messages(roomName){
   this.roomName = roomName;
@@ -34,10 +44,26 @@ function createRoom(roomName){
 
     socket.on("msg", (msg)=>{
       console.log(`[${msg['time']}]${msg['userId']}: ${msg['msg']}`);
-      msgLog.push(msg);
-      socket.emit("msg",msgLog);
-      socket.broadcast.emit("msg", msgLog);
-      console.log(msgLog);
+
+      connection.query(
+        "INSERT INTO webchat (userId, msg, time, room) VALUES (?,?,?,?)",
+        [msg['userId'],msg['msg'],msg['time'],msg['room']], () =>{
+          console.log("data inserted in <webchat>");
+          connection.query(
+            "SELECT * FROM webchat WHERE room = ?",[msg['room']],(err, result)=>{
+              console.log("data found");
+              socket.emit("msg", result);
+              socket.broadcast.emit("msg",result);
+              console.log(result);
+            }
+          )
+        }
+      );
+
+      //msgLog.push(msg);
+      //socket.emit("msg",msgLog);
+      //socket.broadcast.emit("msg", msgLog);
+      //console.log(msgLog);
     });
 
     socket.on("error", (error)=>{

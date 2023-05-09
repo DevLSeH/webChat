@@ -1,9 +1,10 @@
 {
   "dependencies": {
     "express": "^4.18.2",
+    "mysql2": "^3.3.0",
     "socket.io": "^4.6.1"
   },
   "scripts": {
-    "start":"node app"
+    "start": "node app"
   }
 }
