@@ -2,9 +2,14 @@
 <html>
     <head>
       <meta charset="UTF-8">
-      <title>wed-chat</title>
+      <title>wed-chat[]</title>
       <style>
-        div{
+        .background{
+          display:flex;
+          justify-content: center;
+        }
+        .chatBox{
+            align-self: center;
             width: 300px; 
             height: 600px; 
             overflow-y: scroll;
@@ -12,7 +17,16 @@
             border: 2px solid black;
             text-align: left;
         }
-        span{color: rgb(19, 77, 97); word-break: break-all;}
+        .time{
+          color: black; 
+          word-break: break-all;
+          font-size: small;
+        }
+        .msg{
+          color: midnightblue;
+          word-break: break-all;
+          font-size: medium;
+        }
       </style>
     </head>
     <body>
@@ -22,19 +36,24 @@
           path: '/socket.io',
         });
 
+        socket.on("title", (name)=>{
+          document.title = name;
+        })
+        
+
         socket.on('news', function (data) {
           console.log(data);
-          socket.emit('reply', 'Hello Node.JS');
+          socket.emit('reply', data);
         });   
 
         function MessageLog(msgLog) { 
-          const result =msgLog.map(msg=>`<span>[${msg['time']}]${msg['userId']}:${msg['msg']}</span><br>`);
+          const result =msgLog.map(msg=>`<span class="time">[${msg['time']}]<br><span class="msg">${msg['userId']} : ${msg['msg']}</span><br>`);
           return result;
         };
         
         function printLog(msgLog) {
-          document.getElementById("result").innerHTML = "";
-          msgLog.map(log=> (document.getElementById("result").innerHTML += log));
+          document.getElementById("msgLog").innerHTML = "";
+          msgLog.map(log=> (document.getElementById("msgLog").innerHTML += log));
           document.body.scrollTop=document.body.scrollHeight;
         };
 
@@ -52,7 +71,7 @@
               'time': `${time()}`,
               'userId': `${document.getElementById("userId").value}`,
               'msg': `${document.getElementById("msg").value}`,
-              'room': `${window.location.href.replace("http://localhost:3000/","")}`
+              'room': `${document.title}`
           };
           document.getElementById("msg").value = "";
           if(msg.userId == "") {alert("userId는 필수입니다"); return;}
@@ -62,12 +81,18 @@
           socket.emit("msg", (msg));
         };
       </script>
-      <form action="javascript:sendMsg()">
-        userId: <input type="text" id="userId" placeholder="user id"/><br>
-        message: <input type="text" id="msg" placeholder="message"/><br>
-        <input type="submit" value="전송하기"/>
-        <button type="button" onclick="window.location.href = 'http://localhost:3000/'">로비로 가기</button>
-      </form>
-      <div id="result"></div>
+      <div class="background">
+        <div>
+          <form action="javascript:sendMsg()">
+            userId: <input type="text" id="userId" placeholder="user id"/><br>
+            message: <input type="text" id="msg" placeholder="message"/><br>
+            <br>
+            <input type="submit" value="전송하기"/>
+            <button type="button" onclick="window.location.href = 'http://localhost:3000/'">로비로 가기</button>
+          </form>
+          <br>
+          <div class="chatBox" id="msgLog"></div>
+        </div>
+      </div>
     </body>
 </html>

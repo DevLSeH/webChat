@@ -15,38 +15,39 @@ const connection = mysql.createConnection({
 
 connection.connect();
 connection.query(
-  "delete from rooms",(err, result)=>{
+  "truncate rooms",(err)=>{
     if(!err){console.log("DB<rooms> was reset");}
     else{throw(err);};
   }
 );
 connection.query(
-  "delete from webchat",(err,result)=>{
+  "truncate webchat",(err)=>{
     if(!err){console.log("DB<webchat> was reset");}
     else{throw(err);};
   }
 )
 
-function messages(roomName){
-  this.roomName = roomName;
-  this.msgLog = [];
-}
+//function messages(roomName){
+//  this.roomName = roomName;
+//  this.msgLog = [];
+//}
 
-let mainCount = 0;
-const rooms = [];
-function createRoom(roomName){
-  const name = roomName;
-  const path = "/"+name;
+//let mainCount = 0;
+//const rooms = [];
+function createRoom(encodeRoomName){
+  const encodeName = encodeRoomName;
+  const name = decodeURI(encodeRoomName);
+  const path = "/"+encodeName;
   const room= io.of(path);
   
   app.get(path, (req,res)=>{
       res.sendFile(__dirname+"/room.html")
   });
   
-  const localCount = mainCount;
-  mainCount += 1;
-  rooms[localCount] = new messages(name);
-  const msgLog = rooms[localCount].msgLog;
+  //const localCount = mainCount;
+  //mainCount += 1;
+  //rooms[localCount] = new messages(name);
+  //const msgLog = rooms[localCount].msgLog;
 
   room.on("connection", (socket)=>{
     const req = socket.request;
@@ -54,22 +55,21 @@ function createRoom(roomName){
     const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
     console.log("new Client Connected", ip, socket.id);
 
-    socket.emit("msg", msgLog);
+    socket.emit("title", name);
 
     socket.on("msg", (msg)=>{
-      console.log(`[${msg['time']}]${msg['userId']}: ${msg['msg']}`);
+      //console.log(`[${msg['time']}]${msg['userId']}: ${msg['msg']}`);
 
       connection.query(
         "INSERT INTO webchat (userId, msg, time, room) VALUES (?,?,?,?)",
         [msg['userId'],msg['msg'],msg['time'],msg['room']], (err) =>{
           if(!err){
-            console.log("data inserted in <webchat>");
+            console.log("data insert in <webchat>");
             connection.query(
               "SELECT * FROM webchat WHERE room = ? order by cast(id as char)",[msg['room']],(err, result)=>{
-                console.log("data found");
                 socket.emit("msg", result);
                 socket.broadcast.emit("msg",result);
-                console.log(result);
+                console.log(result.pop());
               }
             )
           }else{throw(err);};
@@ -92,8 +92,8 @@ function createRoom(roomName){
     });
     
     socket.interval = setInterval(()=>{
-        socket.emit("news", "Hello Socket.IO");
-    }, 50000);
+        socket.emit("news", `roomName : ${name}`);
+    }, 100000);
 
     socket.on("disconnect", ()=>{
       console.log('Client is Disconnected', ip, socket.id);
@@ -119,7 +119,9 @@ lobby.on("connection", (socket)=>{
   );
   
   socket.on("create",(roomInfo)=>{
-  const roomName = encodeURI(roomInfo['roomName']);
+  const roomName = roomInfo['roomName'];
+  const encodeRoomName = encodeURI(roomName);
+  console.log(roomName , encodeRoomName);
   if(nameSpace.includes(roomName)){
     console.log("join room :"+roomName);
     socket.emit("created", roomName);
@@ -133,7 +135,7 @@ lobby.on("connection", (socket)=>{
     }
   );
   console.log("create room :"+roomName);
-  createRoom(roomName);
+  createRoom(encodeRoomName);
   socket.emit("created", roomName);
   return;
   }

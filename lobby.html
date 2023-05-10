@@ -3,6 +3,12 @@
     <head>
         <meta charset="UTF-8">
         <title>chat-lobby</title>
+        <style>
+          .background{
+            display:flex;
+            justify-content: center;
+          }
+        </style>
     </head>
     <body>
         <script src="/socket.io/socket.io.js"></script>
@@ -27,13 +33,16 @@
         
           function moveRoom(roomName){
             const roomUrl = "http://localhost:3000/"+roomName;
-            window.location.replace(encodeURI(roomUrl).replace(/25/gi,""));
+            window.location.replace(roomUrl);
           }
 
         </script>
-        <form action="javascript:createRoom()">
-            room name: <input type="text" id="roomName" placeholder="room name"/><br>
-            <input type="submit" value="채팅방 참여하기">
-        </form>
+        <div class="background">
+          <form action="javascript:createRoom()">
+              room name: <input type="text" id="roomName" placeholder="room name"/><br>
+              <br>
+              <input type="submit" value="채팅방 참여하기">
+          </form>
+        </div>
     </body>
 </html>
