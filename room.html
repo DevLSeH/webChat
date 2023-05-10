@@ -5,7 +5,9 @@
       <title>wed-chat</title>
       <style>
         div{
-            width: 300px; height: 600px; 
+            width: 300px; 
+            height: 600px; 
+            overflow-y: scroll;
             background-color: rgb(204, 251, 255);
             border: 2px solid black;
             text-align: left;
@@ -33,6 +35,7 @@
         function printLog(msgLog) {
           document.getElementById("result").innerHTML = "";
           msgLog.map(log=> (document.getElementById("result").innerHTML += log));
+          document.body.scrollTop=document.body.scrollHeight;
         };
 
         socket.on("msg", (msgLog)=>{
