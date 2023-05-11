@@ -56,7 +56,7 @@
             function printLog(msgLog) {
                 document.getElementById("msgLog").innerHTML = "";
                 msgLog.map((log) => (document.getElementById("msgLog").innerHTML += log));
-                document.body.scrollTop = document.body.scrollHeight;
+                document.getElementById("msgLog").scrollTop = document.getElementById("msgLog").scrollHeight;
             }
 
             socket.on("msg", (msgLog) => {
