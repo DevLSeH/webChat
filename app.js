@@ -126,22 +126,19 @@ lobby.on("connection", (socket) => {
     socket.on("create", (roomInfo) => {
         const roomName = roomInfo["roomName"];
         const encodeRoomName = encodeURI(roomName);
-        console.log(roomName, encodeRoomName);
         if (nameSpace.includes(roomName)) {
             console.log("join room :" + roomName);
             socket.emit("created", roomName);
             return;
+        } else {
+            //nameSpace.push(roomName);
+            connection.query("insert into rooms (room) value (?)", [roomName], () => {
+                console.log("saved roomName");
+            });
+            console.log("create room :" + roomName);
+            createRoom(encodeRoomName);
+            socket.emit("created", roomName);
+            return;
         }
-
-        //nameSpace.push(roomName);
-        connection.query("insert into rooms (room) value (?)", [roomName], () => {
-            console.log("saved roomName");
-        });
-        console.log("create room :" + roomName);
-        createRoom(encodeRoomName);
-        socket.emit("created", roomName);
-        return;
     });
 });
-
-createRoom("default");
