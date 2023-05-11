@@ -9,7 +9,7 @@ const connection = mysql.createConnection({
     host: "localhost",
     user: "root",
     port: "3306",
-    password: process.env.mySQl_PW,
+    password: process.env.mySQL_PW,
     database: "socketio",
 });
 
@@ -59,6 +59,11 @@ function createRoom(encodeRoomName) {
 
         socket.emit("title", name);
 
+        connection.query("SELECT * FROM webchat WHERE room = ? order by cast(id as signed)", [name], (err, result) => {
+            socket.emit("msg", result);
+            socket.broadcast.emit("msg", result);
+        });
+
         socket.on("msg", (msg) => {
             //console.log(`[${msg['time']}]${msg['userId']}: ${msg['msg']}`);
 
@@ -69,7 +74,7 @@ function createRoom(encodeRoomName) {
                     if (!err) {
                         console.log("data insert in <webchat>");
                         connection.query(
-                            "SELECT * FROM webchat WHERE room = ? order by cast(id as char)",
+                            "SELECT * FROM webchat WHERE room = ? order by cast(id as signed)",
                             [msg["room"]],
                             (err, result) => {
                                 socket.emit("msg", result);
