@@ -1,0 +1,7 @@
+{
+    "editor.formatOnSave": true,
+    "cSpell.autoFormatConfigFile": true,
+    "editor.formatOnPaste": true,
+    "javascript.format.insertSpaceAfterCommaDelimiter": false,
+    "prettier.tabWidth": 4
+}

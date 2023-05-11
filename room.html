@@ -1,98 +1,104 @@
 <!DOCTYPE html>
 <html>
     <head>
-      <meta charset="UTF-8">
-      <title>wed-chat[]</title>
-      <style>
-        .background{
-          display:flex;
-          justify-content: center;
-        }
-        .chatBox{
-            align-self: center;
-            width: 300px; 
-            height: 600px; 
-            overflow-y: scroll;
-            background-color: rgb(204, 251, 255);
-            border: 2px solid black;
-            text-align: left;
-        }
-        .time{
-          color: black; 
-          word-break: break-all;
-          font-size: small;
-        }
-        .msg{
-          color: midnightblue;
-          word-break: break-all;
-          font-size: medium;
-        }
-      </style>
+        <meta charset="UTF-8" />
+        <title>wed-chat[]</title>
+        <style>
+            .background {
+                display: flex;
+                justify-content: center;
+            }
+            .chatBox {
+                align-self: center;
+                width: 300px;
+                height: 600px;
+                overflow-y: scroll;
+                background-color: rgb(204, 251, 255);
+                border: 2px solid black;
+                text-align: left;
+            }
+            .time {
+                color: black;
+                word-break: break-all;
+                font-size: small;
+            }
+            .msg {
+                color: midnightblue;
+                word-break: break-all;
+                font-size: medium;
+            }
+        </style>
     </head>
     <body>
-      <script src="/socket.io/socket.io.js"></script>
-      <script>
-        const socket = io.connect(window.location.href, {
-          path: '/socket.io',
-        });
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            const socket = io.connect(window.location.href, {
+                path: "/socket.io",
+            });
 
-        socket.on("title", (name)=>{
-          document.title = name;
-        })
-        
+            socket.on("title", (name) => {
+                document.title = name;
+            });
 
-        socket.on('news', function (data) {
-          console.log(data);
-          socket.emit('reply', data);
-        });   
+            socket.on("news", function (data) {
+                console.log(data);
+                socket.emit("reply", data);
+            });
 
-        function MessageLog(msgLog) { 
-          const result =msgLog.map(msg=>`<span class="time">[${msg['time']}]<br><span class="msg">${msg['userId']} : ${msg['msg']}</span><br>`);
-          return result;
-        };
-        
-        function printLog(msgLog) {
-          document.getElementById("msgLog").innerHTML = "";
-          msgLog.map(log=> (document.getElementById("msgLog").innerHTML += log));
-          document.body.scrollTop=document.body.scrollHeight;
-        };
+            function MessageLog(msgLog) {
+                const result = msgLog.map(
+                    (msg) =>
+                        `<span class="time">[${msg["time"]}]<br><span class="msg">${msg["userId"]} : ${msg["msg"]}</span><br>`,
+                );
+                return result;
+            }
 
-        socket.on("msg", (msgLog)=>{
-          printLog(MessageLog(msgLog));
-        });
+            function printLog(msgLog) {
+                document.getElementById("msgLog").innerHTML = "";
+                msgLog.map((log) => (document.getElementById("msgLog").innerHTML += log));
+                document.body.scrollTop = document.body.scrollHeight;
+            }
 
-        function time() {
-          const timeNow = 
-          `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`;
-          return timeNow;
-        };
-        function sendMsg() {
-          const msg = {
-              'time': `${time()}`,
-              'userId': `${document.getElementById("userId").value}`,
-              'msg': `${document.getElementById("msg").value}`,
-              'room': `${document.title}`
-          };
-          document.getElementById("msg").value = "";
-          if(msg.userId == "") {alert("userId는 필수입니다"); return;}
-          if(msg.msg == "") {return;}
-          console.log(`[${msg['time']}]${msg['userId']}: ${msg['msg']}`);
-        
-          socket.emit("msg", (msg));
-        };
-      </script>
-      <div class="background">
-        <div>
-          <form action="javascript:sendMsg()">
-            userId: <input type="text" id="userId" placeholder="user id"/><br>
-            message: <input type="text" id="msg" placeholder="message"/><br>
-            <br>
-            <input type="submit" value="전송하기"/>
-            <button type="button" onclick="window.location.href = '/'">로비로 가기</button>
-          </form>
-          <br>
-          <div class="chatBox" id="msgLog"></div>
+            socket.on("msg", (msgLog) => {
+                printLog(MessageLog(msgLog));
+            });
+
+            function time() {
+                const timeNow = `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()}`;
+                return timeNow;
+            }
+            function sendMsg() {
+                const msg = {
+                    time: `${time()}`,
+                    userId: `${document.getElementById("userId").value}`,
+                    msg: `${document.getElementById("msg").value}`,
+                    room: `${document.title}`,
+                };
+                document.getElementById("msg").value = "";
+                if (msg.userId == "") {
+                    alert("userId는 필수입니다");
+                    return;
+                }
+                if (msg.msg == "") {
+                    return;
+                }
+                console.log(`[${msg["time"]}]${msg["userId"]}: ${msg["msg"]}`);
+
+                socket.emit("msg", msg);
+            }
+        </script>
+        <div class="background">
+            <div>
+                <form action="javascript:sendMsg()">
+                    userId: <input type="text" id="userId" placeholder="user id" /><br />
+                    message: <input type="text" id="msg" placeholder="message" /><br />
+                    <br />
+                    <input type="submit" value="전송하기" />
+                    <button type="button" onclick="window.location.href = '/'">로비로 가기</button>
+                </form>
+                <br />
+                <div class="chatBox" id="msgLog"></div>
+            </div>
         </div>
-      </div>
     </body>
 </html>

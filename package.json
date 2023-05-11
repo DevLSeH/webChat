@@ -1,11 +1,27 @@
 {
-  "dependencies": {
-    "dotenv": "^16.0.3",
-    "express": "^4.18.2",
-    "mysql2": "^3.3.0",
-    "socket.io": "^4.6.1"
-  },
-  "scripts": {
-    "start": "node app"
-  }
+    "dependencies": {
+        "dotenv": "^16.0.3",
+        "express": "^4.18.2",
+        "mysql2": "^3.3.0",
+        "socket.io": "^4.6.1"
+    },
+    "scripts": {
+        "start": "node app"
+    },
+    "devDependencies": {
+        "eslint": "^8.40.0",
+        "eslint-plugin-import": "^2.27.5"
+    },
+    "eslintConfig": {
+        "extends": [
+            "airbnb",
+            "plugin:prettier/recommended"
+        ],
+        "rules": {
+            "object-curly-newline": 0
+        },
+        "env": {
+            "browser": true
+        }
+    }
 }

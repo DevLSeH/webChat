@@ -1,48 +1,50 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8">
+        <meta charset="UTF-8" />
         <title>chat-lobby</title>
         <style>
-          .background{
-            display:flex;
-            justify-content: center;
-          }
+            .background {
+                display: flex;
+                justify-content: center;
+            }
         </style>
     </head>
     <body>
         <script src="/socket.io/socket.io.js"></script>
         <script>
-          const socket = io.connect(window.location.href, {
-            path: '/socket.io',
-          });
+            const socket = io.connect(window.location.href, {
+                path: "/socket.io",
+            });
 
-           async function createRoom() {
-            const roomInfo = {
-                'roomName': document.getElementById("roomName").value,
+            async function createRoom() {
+                const roomInfo = {
+                    roomName: document.getElementById("roomName").value,
+                };
+                document.getElementById("roomName").value = "";
+                if (roomInfo.roomName == "") {
+                    alert("생성할 방 이름을 입력해주세요");
+                    return;
+                }
+                console.log("create room :" + roomInfo.roomName);
+                await socket.emit("create", roomInfo);
             }
-            document.getElementById("roomName").value = "";
-            if(roomInfo.roomName==""){alert("생성할 방 이름을 입력해주세요"); return;};
-            console.log("create room :"+roomInfo.roomName);
-            await socket.emit("create", (roomInfo));
-          }
 
-          socket.on("created", (roomName)=>{
-            moveRoom(roomName);
-          })
-        
-          function moveRoom(roomName){
-            const roomUrl = "/"+roomName;
-            window.location.href= roomUrl;
-          }
+            socket.on("created", (roomName) => {
+                moveRoom(roomName);
+            });
 
+            function moveRoom(roomName) {
+                const roomUrl = "/" + roomName;
+                window.location.href = roomUrl;
+            }
         </script>
         <div class="background">
-          <form action="javascript:createRoom()">
-              room name: <input type="text" id="roomName" placeholder="room name"/><br>
-              <br>
-              <input type="submit" value="채팅방 참여하기">
-          </form>
+            <form action="javascript:createRoom()">
+                room name: <input type="text" id="roomName" placeholder="room name" /><br />
+                <br />
+                <input type="submit" value="채팅방 참여하기" />
+            </form>
         </div>
     </body>
 </html>
